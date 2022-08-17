@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, KeyboardAvoidingView} from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, Alert, Platform } from 'react-native';
 import { addDoc, doc, setDoc, collection, getDoc, updateDoc } from 'firebase/firestore'
 import { auth, db} from '../Firebase'
 import { AntDesign } from '@expo/vector-icons'; 
@@ -8,6 +8,9 @@ const Home = ({navigation}) => {
   const [isPressed,setPressed] = useState(false)
   const [name,setName] = useState("")
   const [code,setCode] = useState("")
+
+  const bannerId = Platform.OS === 'ios' ? 'ca-app-pub-6997156054138330/2747039842' : 'ca-app-pub-6997156054138330/2579518889'
+  const interstitialId = Platform.OS === 'ios' ? 'ca-app-pub-6997156054138330/8793573442' : 'ca-app-pub-6997156054138330/5014110536'
 
   const createGame = async() => {
     if(name === "") {
@@ -31,7 +34,11 @@ const Home = ({navigation}) => {
 
   const joinGame = async() => {
     if(name === "") {
-      alert("Name can't be empty")
+      Alert.alert('Error',"Name can't be empty")
+      return
+    }
+    if(code === ""){
+      Alert.alert('Error',"Code can't be empty")
       return
     }
     const d = await getDoc(doc(db,"games",code))
@@ -52,24 +59,35 @@ const Home = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleView}>
-        <Text style={{fontSize: 20}}>Enter your name:</Text>
-      </View>
-      <TextInput style={styles.nameInput} placeholder={"Name..."} maxLength={10} onChangeText={newText => setName(newText)}/>
-      <TouchableOpacity style={styles.createButton} onPress={createGame}>
-        <Text style={{fontSize: 20}}>Create Game</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.joinButton} onPress={() => setPressed(true)}>
-        <Text style={{fontSize: 20}}>Join Game</Text>
-      </TouchableOpacity>
-      <KeyboardAvoidingView style={{position:"absolute", bottom:50}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <View style={{marginTop: 40, flexDirection: "row", justifyContent: "center",alignItems: "center", marginLeft:40, display: isPressed ? "flex" : "none"}}>
-          <TextInput style={{width:200,height:40,borderRadius: 30, borderWidth: 2, textAlign:"center",fontSize: 20,backgroundColor:"black",color:"white"}} placeholder={"Code..."} placeholderTextColor={"white"} onChangeText={newText => setCode(newText)}/>
-          <TouchableOpacity style={{marginLeft: 10}} onPress={joinGame}>
-            <AntDesign name="play" size={30} color="black" />
+      
+      <View style={{flex:9,justifyContent: 'center'}}>
+        <View style={styles.topPart}>
+          <View style={styles.titleView}>
+            <Text style={{fontSize: 20}}>Enter your name:</Text>
+          </View>
+          <TextInput style={styles.nameInput} placeholder={"Name..."} maxLength={10} onChangeText={newText => setName(newText)}/>
+        </View>
+        
+        <View style={styles.midPart}>
+          
+          <TouchableOpacity style={styles.createButton} onPress={createGame}>
+            <Text style={{fontSize: 20}}>Create Game</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.joinButton} onPress={() => setPressed(true)}>
+            <Text style={{fontSize: 20}}>Join Game</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+        
+        <KeyboardAvoidingView style={{position:"absolute", bottom:50}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+          <View style={{marginTop: 40, flexDirection: "row", justifyContent: "center",alignItems: "center", marginLeft:40, display: isPressed ? "flex" : "none"}}>
+            <TextInput style={{width:200,height:40,borderRadius: 30, borderWidth: 2, textAlign:"center",fontSize: 20,backgroundColor:"black",color:"white"}} placeholder={"Code..."} placeholderTextColor={"white"} onChangeText={newText => setCode(newText)}/>
+            <TouchableOpacity style={{marginLeft: 10}} onPress={joinGame}>
+              <AntDesign name="play" size={30} color="black" />
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+      
       
       
     </View>
@@ -78,15 +96,21 @@ const Home = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 10,
     backgroundColor: '#D4F1F4',
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: 'center'
   },
   titleView: {
     width: 232,
     height: 37,
-    marginTop: 139,
     alignItems: "center"
+  },
+  midPart: {
+    alignItems: 'center'
+  },  
+  topPart: {
+    alignItems: 'center'
   },
   nameInput: {
     width: 120,
@@ -100,7 +124,7 @@ const styles = StyleSheet.create({
   createButton: {
     width: 187,
     height: 52,
-    marginTop: 279,
+    marginTop: 10,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 30,

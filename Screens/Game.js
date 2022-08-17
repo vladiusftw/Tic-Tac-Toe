@@ -14,6 +14,8 @@ const Game = ({route, navigation}) => {
     const [player1Score,setPlayer1Score] = useState(0)
     const [player2Score,setPlayer2Score] = useState(0)
     const [playerTurn,setPlayerTurn] = useState()
+
+    const interstitialId = Platform.OS === 'ios' ? 'ca-app-pub-6997156054138330/8793573442' : 'ca-app-pub-6997156054138330/5014110536'
    
     useEffect(() => {
         const unsub = onSnapshot(doc(db,"games",gameCode), (doc) => {
@@ -99,6 +101,10 @@ const Game = ({route, navigation}) => {
             tie()
     }
 
+    const finishGame = async() => {
+        navigation.popToTop()
+    }
+
 
     return(
         <View style={styles.container}>
@@ -146,7 +152,7 @@ const Game = ({route, navigation}) => {
                 </View>
             </View>
 
-            <TouchableOpacity style={styles.endGame} onPress={() => navigation.popToTop()}>
+            <TouchableOpacity style={styles.endGame} onPress={finishGame}>
                 <Text style={{fontSize: 20}}>End Game</Text>
             </TouchableOpacity>
 
@@ -157,22 +163,25 @@ const Game = ({route, navigation}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#D4F1F4"
+        backgroundColor: "#D4F1F4",
+        justifyContent: 'center'
     },
     title: {
-        marginTop: 64,
-        marginLeft: 24
+        marginLeft: 24,
+        bottom: '8%'
     },
     names: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginLeft: 17,
         marginRight: 18,
-        marginTop: 18
+        bottom: '10%'
+        
     },
     scoreTimer: {
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        bottom: '10%'
     },
     score1: {
         width: 67,
@@ -198,7 +207,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     board: {
-        marginTop: 71,
+        marginTop: 0,
         alignItems: "center"
     },
     row: {
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
     endGame: {
         width: 133,
         height: 44,
-        marginTop: 82,
+        top: '10%',
         backgroundColor: "#75E6DA",
         borderRadius: 30,
         alignSelf: "center",
